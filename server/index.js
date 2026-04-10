@@ -5,11 +5,16 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import OpenAI from 'openai';
 import FormData from 'form-data';
+import url from 'url';
+import path from 'path';
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -128,6 +133,13 @@ app.post('/api/enhance-passport', upload.single('image_file'), async (req, res) 
     }
     res.status(500).json({ error: error.message });
   }
+});
+
+// Serve frontend in production
+app.use(express.static(path.join(__dirname, '../dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 app.listen(port, () => {
